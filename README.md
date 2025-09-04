@@ -1,4 +1,6 @@
 # Algoritmer og datastrukturer - Oblig1
+Dette er første obligatoriske oppgave i faget Algoritmer og datastrukturer. Den ble levert via Github classroom, og er derfor bare kopiert hit. 
+
 ## Oppgave 1
 I oppgave 1 gikk jeg frem ved å bruke boblesortering, som sammenligner to naboverdier og bytter plass dersom de danner en inversjon (ved hjelp av bytt-metoden). Trenger kun at man går gjennom for-løkka en gang, for da vil det største elementet være på siste plassen, så det er sisteplassen som blir returnert.
 For å finne antall ombyttinger la jeg på en teller som øker for hvert bytte.
