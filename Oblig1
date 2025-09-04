@@ -1,0 +1,258 @@
+public class Oblig1 {
+
+    private Oblig1() {}
+
+    // Oppgave 0
+    public static int gruppeMedlemmer() {
+        return 1;
+    }
+
+    // Oppgave 1
+    public static int maks(int[] a) {
+        if (a.length < 1)
+            throw new java.util.NoSuchElementException("Tabellen er tom");
+
+        for (int i = 0; i < a.length-1; i++) {
+            // Sjekker om elementet på indeks i er større enn elementet på neste plass
+            if (a[i] > a[i+1]) {
+                // Hvis det er tilfellet, bytter de plass
+                bytt(a, i, i+1);
+            }
+        }
+        // Returnerer det største, som er på slutten av arrayet
+        return a[a.length-1];
+    }
+
+    public static void bytt(int[] a, int i, int j) {
+        int temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+    }
+
+    /*
+    a) Hvor mange sammenligninger blir det, som en funksjon av n?
+    n-1 sammenligninger. if-testen sammenligner én gang per runde i løkka, og ettersom
+    for-løkka går fra 0 til lengden-1 blir det n-1 og ikke bare n.
+
+    b) Når blir det færrest ombyttinger?
+    Det blir færrest ombyttinger når arrayet er sortert stigende, da blir det ingen ombyttinger.
+
+    c) Når blir det flest ombyttinger?
+    Det blir flest ombyttinger når arrayet er sortert omvendt, dvs. største tallet først og minste sist.
+
+    d) Hvor mange ombyttinger blir det i gjennomsnitt?
+    I gjennomsnitt blir det (n-1)/2 ombyttinger.
+     */
+    public static int ombyttinger(int[] a) {
+        int bytter = 0; // Teller
+
+        for (int i = 0; i < a.length-1; i++) {
+            if (a[i] > a[i+1]) {
+                bytt(a, i, i+1);
+                bytter++; // Øker teller for antall bytter
+            }
+        }
+        return bytter;
+    }
+
+    // Oppgave 2
+    public static int antallUlikeSortert(int[] a) {
+        //Sjekker om arrayet er sortert med erSortert-metoden, gir feilmld hvis ikke
+        if (!erSortert(a))
+            throw new IllegalStateException("Tabellen er ikke sortert stigende");
+
+        // Sjekker om arrayet er tomt, returnerer 0 hvis det er det
+        if(a.length == 0)
+            return 0;
+
+        /* Teller som teller antall ulike tall.
+        Starter på 1, fordi det første er et unikt tall så lenge ikke den er tom
+         */
+        int antall = 1;
+        // Starter for-løkka på 1, fordi tallet på indeks 0 er unikt
+        for (int i = 1; i < a.length; i++) {
+            // Sammenligner nåværende verdi med forrige
+            if (a[i] != a[i-1]) {
+                // Hvis verdiene ikke er like, økes antallet
+                antall++;
+            }
+        }
+        return antall;
+    }
+    public static boolean erSortert(int[] a) {
+        for (int i = 1; i < a.length; i++){
+            //Sjekker om det forrige elementet er større enn det nåværende
+            // (dvs. ikke sortert stigende) -> returnerer false
+            if (a[i-1] > a[i]) return false;
+        }
+        return true;
+    }
+
+    // Oppgave 3
+    public static int antallUlikeUsortert(int[] a) {
+        if (a.length == 0)
+            return 0;
+
+        // Teller antall ulike tall
+        int antall = 0;
+
+        /* Ytre løkke går gjennom hvert element, og antar at hvert element er
+        unikt ved å sette booleanen lik true.*/
+        for (int i = 0; i < a.length; i++){
+            boolean erUnik = true;
+
+            /* Indre løkke starter på i + 1, for å unngå tidligere sammenligninger.
+            Sjekker om det nåværende elementet i den ytre løkken finnes igjen senere i tabellen.
+            Hvis den finner igjen elementet settes boolean til false og man bryter ut av løkken
+             */
+            for (int j = i + 1; j < a.length; j++) {
+                if (a[i] == a[j]) {
+                    erUnik = false;
+                    break;
+                }
+            }
+            /* Når man har gått gjennom indre løkke sjekker man om erUnik fortsatt er true.
+            Hvis den er true, økes antallet med 1. */
+            if (erUnik) {
+                antall++;
+            }
+        }
+        return antall;
+    }
+
+    // Oppgave 4
+    public static void delsortering(int[] a) {
+        int v = 0, h = a.length-1;
+
+        // Deler tabellen; oddetall til venstre, partall til høyre
+        while (v <= h){
+            if (a[v] % 2 != 0) { // Hvis det er et oddetall
+                v++;             // Flytt venstre peker til høyre
+            }
+            else bytt(a, v, h--); // Hvis det er et partall, bytt v og h
+                                  // + flytt høyre peker til venstre
+        }
+        // Nå er oddetallene i [0, v-1] og partallene i [v, a.length-1]
+
+        // Sorterer oddetallene (venstre del)
+        kvikksortering(a, 0, v-1);
+
+        // Sorterer partallene (høyre del) ved hjelp av kvikksortering
+        kvikksortering(a, v, a.length-1);
+    }
+
+    public static void kvikksortering(int[] a, int fra, int til) {
+        if (fra < til) {
+            // Velger pivotelement og partisjonerer("deler") arrayet m/partisjonmetoden
+            int pivotIndeks = partisjon(a, fra, til);
+
+            // Sorterer venstre del av arrayet
+            kvikksortering(a, fra, pivotIndeks-1);
+
+            // Sorterer høyre del av arrayet
+            kvikksortering(a, pivotIndeks, til);
+        }
+    }
+
+    public static int partisjon(int[] a, int fra, int til) {
+        int pivot = a[til]; // Siste element settes som pivot
+        int v = fra; // Startpeker fra venstre
+        int h = til-1; // Startpeker fra høyre (en plass til venstre for pivot)
+
+        while (v <= h) {
+            // Flytter v-peker til høyre til man finner element større eller lik pivot,
+            // flytter v-peker en til høyre
+            while (v <= h && a[v] < pivot) v++;
+            // Flytter h-peker til venstre til man finner element mindre enn pivot,
+            // flytter h-peker en til venstre
+            while (v <= h && a[h] >= pivot) h--;
+
+            // Hvis v-peker er mindre enn h-peker, bytt plass og flytt pekere
+            if (v < h) {
+                bytt(a, v++, h--);
+            }
+        }
+        // Bytter pivot-elementet på sin riktige posisjon
+        bytt(a, v, til);
+        // Returnerer indeksen til pivot-elementet
+        return v;
+    }
+
+    // Oppgave 5
+    public static void rotasjon(char[] a) {
+        // Sjekker om arrayet er for kort
+        if (a.length < 2) return;
+
+        // Lagrer verdien på den siste posisjonen i arrayet
+        char siste = a[a.length - 1];
+
+
+        // Flytter elementene til høyre ved å gå gjennom løkka fra høyre mot venstre
+        for (int i = a.length - 1; i > 0; i--) {
+            // Flytter elementet på posisjon i-1 til i
+            a[i] = a[i - 1];
+        }
+        // Setter det siste elementet først i arrayet
+        a[0] = siste;
+    }
+// Oppgave 7
+    public static String flett(String s, String t) {
+        // Oppretter et array for å lagre resultatet av flettingen
+        // Lengden på arrayet er summen av lengden på s og t
+        char[] flette = new char[s.length() + t.length()];
+        // i er indeks for s
+        // j er indeks for t
+        // k er indeks for arrayet
+        int i = 0, j = 0, k = 0;
+
+        // Går så lenge det er tegn igjen i BÅDE s og t
+        while (i < s.length() && j < t.length()) {
+            flette[k++] = s.charAt(i++); // legger til et tegn fra s
+            flette[k++] = t.charAt(j++); // så et tegn fra t
+        }
+        // Disse brukes kun dersom det er forskjellig lengde på s og t
+        // Legger til resten av tegnene fra s hvis det er noen igjen
+        while (i < s.length()) flette[k++] = s.charAt(i++);
+        // Legger til resten av tegnene fra t
+        while (j < t.length()) flette[k++] = t.charAt(j++);
+
+        // Konverterer arrayet tilbake til streng
+        return new String(flette);
+    }
+
+    public static String flett(String... s) {
+        // Finner totallengde av alle strengene ved å summere lengden av hver streng
+        int totallengde = 0;
+        for (String streng : s) {
+            if (streng != null) totallengde += streng.length();
+        }
+
+        // Finner lengden på den lengste strengen, så man vet når for-løkka skal stoppe.
+        int makslengde = 0;
+        for (String streng : s) {
+            if (streng != null) {
+                if (streng.length() > makslengde) makslengde = streng.length();
+            }
+        }
+
+        // Oppretter et tomt array som resultatet legges inn i
+        char[] flettetSammen = new char[totallengde];
+        // Holder styr på hvor(hvilken indeks) neste tegn skal settes inn
+        int indeks = 0;
+
+        // Ytre løkke går gjennom hver bokstav i strengene (første, andre osv.)
+        for (int j = 0; j < makslengde; j++) {
+            // Indre løkke går gjennom hver streng/"ord"
+            for (int i = 0; i < s.length; i++) {
+                String streng = s[i];
+                // Sjekker om strengen ikke er tom og vi er innenfor strengens lengde
+                if (streng != null && j < streng.length()) {
+                    // Legger til tegnet i arrayet
+                    flettetSammen[indeks++] = streng.charAt(j);
+                }
+            }
+        }
+        // Konverterer arrayet til en String
+        return new String(flettetSammen);
+    }
+}
